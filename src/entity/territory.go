@@ -41,13 +41,6 @@ func (Territory) FindByRegionId(id string) []dto.TerritoryRegionDto {
 	return dtos
 }
 
-func (Territory) FindByRegionIdAlt(id string) []dto.TerritoryRegionDto {
-	var territories []Territory
-	var region []Region
-	db.Where("\"RegionID\" = ?", id).Find(&territories)
-	db.Where("\"ID\" ")
-}
-
 func (Territory) IsPresent(territory Territory) bool {
 	isPresent := true
 	if (territory == Territory{}) {
