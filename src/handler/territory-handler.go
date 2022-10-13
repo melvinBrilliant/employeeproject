@@ -8,7 +8,10 @@ import (
 	"com.melvin.employee/src/dto"
 	"com.melvin.employee/src/entity"
 	"github.com/labstack/echo/v4"
+	"github.com/go-playground/validator/v10"
 )
+
+var validate = validator.New()
 
 func GetAllTerritories(c echo.Context) error {
 	var territory entity.Territory
@@ -76,26 +79,41 @@ func FindTerritoryInRegion(c echo.Context) error {
 }
 
 func InsertTerritory(c echo.Context) error {
-	var insertTerritory entity.Territory
-	err := c.Bind(&insertTerritory)
-	if err != nil {
+	var insertDto dto.TerritoryUpsertDto
+	bindErr := c.Bind(&insertDto); if (bindErr != nil) {
 		return c.JSON(http.StatusUnprocessableEntity, "bad request")
 	}
-	return c.JSON(http.StatusAccepted, insertTerritory.Save(insertTerritory))
+	errValidation := validate.Struct(insertDto); if (errValidation != nil) {
+		return c.JSON(http.StatusUnprocessableEntity, errValidation.Error())
+	}
+	var territory = entity.Territory{
+		ID: insertDto.ID,
+		TerritoryDescription: insertDto.TerritoryName,
+		RegionID: insertDto.RegionID,
+	}
+	territory.Save(territory)
+	return c.JSON(http.StatusAccepted, "New territory has been saved!")
 }
 
 func UpdateTerritory(c echo.Context) error {
-	var updateTerritory entity.Territory
-	err := c.Bind(&updateTerritory)
-	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, "bad request")
+	var updateDto dto.TerritoryUpsertDto
+	bindErr := c.Bind(&updateDto); if (bindErr != nil) {
+		return c.JSON(http.StatusUnprocessableEntity, "Bad request")
 	}
-
-	territoryIsPresent := updateTerritory.IsPresent(updateTerritory)
-	if !territoryIsPresent {
+	validateErr := validate.Struct(updateDto); if (validateErr != nil) {
+		return c.JSON(http.StatusUnprocessableEntity, validateErr.Error())
+	}
+	var territory = entity.Territory{
+		ID: updateDto.ID,
+		TerritoryDescription: updateDto.TerritoryName,
+		RegionID: updateDto.RegionID,
+	}
+	if (territory.IsPresent(territory)) {
 		return c.JSON(http.StatusNotFound, "Territory not found")
 	}
-	return c.JSON(http.StatusAccepted, updateTerritory.Save(updateTerritory))
+	// todo : region validation
+	territory.Save(territory)
+	return c.JSON(http.StatusAccepted, "Territory has been updated")
 }
 
 func DeleteTerritoryWithPath(c echo.Context) error {

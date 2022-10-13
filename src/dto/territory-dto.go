@@ -15,7 +15,8 @@ type TerritoryGridDto struct {
 	RegionID int
 }
 
-type RegionGridDto struct {
-	ID int
-	RegionDescription string
+type TerritoryUpsertDto struct {
+	ID string				`validate:"required"`
+	TerritoryName string	`validate:"required"`
+	RegionID int			`validate:"required"`
 }
