@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"database/sql"
+	// "database/sql"
 
 	"com.melvin.employee/src/dto"
 )
@@ -13,37 +13,85 @@ func (Territory) TableName() string {
 type Territory struct {
 	ID string 						`gorm:"primaryKey;column:ID"`
 	TerritoryDescription string 	`gorm:"column:TerritoryDescription"`
-	RegionID int 					`gorm:"column:RegionID"`
+	RegionID int					`gorm:"column:RegionID"`
+	Region Region 					`gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreginkey:RegionID"`
 }
 
-func (Territory) GetAll() []Territory {
-	var territories []Territory
-	db.Find(&territories)
+func convertToTerritoryGridDto(territory Territory) dto.TerritoryGridDto {
+	return dto.TerritoryGridDto{
+		ID: territory.ID,
+		TerritoryName: territory.TerritoryDescription,
+		RegionID: territory.RegionID,
+	}
+}
 
+func toTerritoryGridDtoList(territoryList []Territory) []dto.TerritoryGridDto {
+	var result[] dto.TerritoryGridDto
+	for i := 0; i < len(territoryList); i++ {
+		result = append(result, convertToTerritoryGridDto(territoryList[i]))
+	}
+	return result
+}
+
+func toTerritoryRegionDto(territory Territory) dto.TerritoryRegionDto {
+	return dto.TerritoryRegionDto {
+		TerritoryID: territory.ID,
+		RegionID: territory.RegionID,
+		TerritoryName: territory.TerritoryDescription,
+		RegionName: territory.Region.RegionDescription,
+	}
+}
+
+func toTerritoryRegionDtoList(territories []Territory) []dto.TerritoryRegionDto {
+	var result []dto.TerritoryRegionDto
+	for i := 0; i < len(territories); i++ {
+		result = append(result, toTerritoryRegionDto(territories[i]))
+	}
+	return result
+}
+
+func (Territory) GetAll() []dto.TerritoryGridDto {
+	var territories []Territory
+	db.Find(&territories) 
+	return toTerritoryGridDtoList(territories)
+}
+
+func (Territory) GetAllEager() []Territory {
+	var territories []Territory
+	err := db.Model(&Territory{}).Preload("Region").Find(&territories).Error
+	if (err != nil) {
+		panic(err.Error())
+	}
 	return territories
 }
 
-func (Territory) FindById(id string) Territory {
+func (Territory) GetAllUltraEager() []Territory {
+	var territories []Territory
+	err := db.Model(&Territory{}).Preload("Region.Territories").Find(&territories).Error
+	if (err != nil) {
+		panic(err.Error())
+	}
+	return territories
+}
+
+func (Territory) FindById(id string) dto.TerritoryGridDto {
 	var territory Territory
 	db.Where("\"ID\" = ?", id).First(&territory)
-
-	return territory
+	return convertToTerritoryGridDto(territory)
 }
 
 func (Territory) FindByRegionId(id string) []dto.TerritoryRegionDto {
-	queryLine1 := "SELECT ter.\"ID\", reg.\"ID\", ter.\"TerritoryDescription\", reg.\"RegionDescription\" "
-	queryLine2 := "FROM \"Territory\" AS ter "
-	queryLine3 := "JOIN \"Region\" AS reg on reg.\"ID\" = ter.\"RegionID\" "
-	queryLine4 := "WHERE ter.\"RegionID\" = @regionID "
-	
-	var dtos []dto.TerritoryRegionDto
-	db.Raw(queryLine1 + queryLine2 + queryLine3 + queryLine4, sql.Named("regionID", id)).Scan(&dtos)
-	return dtos
+	var territories []Territory
+	err := db.Model(&Territory{}).Preload("Region").Where("\"RegionID\" = ?", id).Find(&territories).Error
+	if (err != nil) {
+		panic(err.Error())		
+	}
+	return toTerritoryRegionDtoList(territories)
 }
 
 func (Territory) IsPresent(territory Territory) bool {
 	isPresent := true
-	if (territory == Territory{}) {
+	if (&territory == &Territory{}) {
 		isPresent = false
 	}
 	return isPresent

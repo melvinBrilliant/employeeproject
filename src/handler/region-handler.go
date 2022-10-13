@@ -14,6 +14,12 @@ func GetAllRegions(c echo.Context) error {
 	return c.JSON(http.StatusOK, regions)
 }
 
+func GetAllRegionsEager(c echo.Context) error {
+	var region = new(entity.Region)
+	regions := region.FindAllEagerEntity()
+	return c.JSON(http.StatusOK, regions)
+}
+
 func FindRegionByIdQuery(c echo.Context) error {
 	var region = new(entity.Region)
 	id := c.QueryParam("id")

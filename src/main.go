@@ -12,7 +12,7 @@ func main() {
 	os.Setenv("APP_NAME", "EmployeeApp")
 	confAppName := os.Getenv("APP_NAME")
 
-	os.Setenv("SERVER_PORT", "8080")
+	os.Setenv("SERVER_PORT", "8082")
 	confServerPort := os.Getenv("SERVER_PORT")
 
 	server := new(http.Server)

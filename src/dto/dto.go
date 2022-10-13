@@ -8,3 +8,14 @@ type TerritoryRegionDto struct {
 	TerritoryName string `json:"territoryName"`
 	RegionName string `json:"regionName"`
 }
+
+type TerritoryGridDto struct {
+	ID string
+	TerritoryName string
+	RegionID int
+}
+
+type RegionGridDto struct {
+	ID int
+	RegionDescription string
+}
