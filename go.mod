@@ -4,11 +4,7 @@ go 1.19
 
 require gorm.io/driver/postgres v1.3.10
 
-require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
-	github.com/go-ozzo/ozzo-validation/v4 v4.3.0 // indirect
-	github.com/gorilla/schema v1.2.0 // indirect
-)
+require github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -33,10 +29,12 @@ require (
 	github.com/go-openapi/strfmt v0.21.3 // indirect
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/go-openapi/validate v0.22.0 // indirect
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-swagger/go-swagger v0.30.3 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
+	github.com/gorilla/schema v1.2.0
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
